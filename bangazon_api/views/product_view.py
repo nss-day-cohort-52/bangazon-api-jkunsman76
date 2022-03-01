@@ -12,6 +12,7 @@ from bangazon_api.models import Product, Store, Category, Order, Rating, Recomme
 from bangazon_api.serializers import (
     ProductSerializer, CreateProductSerializer, MessageSerializer,
     AddProductRatingSerializer, AddRemoveRecommendationSerializer)
+from django.db.models import Q
 
 
 class ProductView(ViewSet):
@@ -169,8 +170,8 @@ class ProductView(ViewSet):
 
         if number_sold:
             products = products.annotate(
-                order_count=Count('orders')
-            ).filter(order_count__lt=number_sold)
+                order_count=Count('orders', filter=~Q(orders__payment_type=None))
+            ).filter(order_count__gte=number_sold)
 
         if order is not None:
             order_filter = f'-{order}' if direction == 'desc' else order

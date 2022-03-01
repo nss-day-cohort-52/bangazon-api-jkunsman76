@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from rest_framework.response import Response
+from rest_framework import serializers, status
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -15,6 +16,7 @@ class Product(models.Model):
                                    width_field=None, max_length=None, null=True, blank=True)
     category = models.ForeignKey(
         "Category", on_delete=models.CASCADE, related_name='products')
+    
 
     def save(self, *args, **kwargs):
         self.clean_fields()
@@ -26,15 +28,15 @@ class Product(models.Model):
         Returns:
             number -- The average rating for the product
         """
-        # TODO: Fix Divide by zero error
+        try:
+            total_rating = 0
+            for rating in self.ratings.all():
+                total_rating += rating.score
 
-        total_rating = 0
-        for rating in self.ratings.all():
-            total_rating += rating.score
-
-        avg = total_rating / self.ratings.count()
-        return avg
-
+            avg = total_rating / self.ratings.count()
+            return avg
+        except ZeroDivisionError:
+            total_rating = 0
     @property
     def number_purchased(self):
         """Returns the number of times product shows up on completed orders
