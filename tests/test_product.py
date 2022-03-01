@@ -46,7 +46,6 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(response.data['id'])
 
-
     def test_update_product(self):
         """
         Ensure we can update a product.
@@ -75,3 +74,36 @@ class ProductTests(APITestCase):
         response = self.client.get('/api/products')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), Product.objects.count())
+
+    def test_delete_product(self):
+        """
+        Ensure we can delete a product.
+        """
+        # Create new instance
+        category = Category.objects.first()
+        product = Product()
+        product.name = self.faker.ecommerce_name()
+        product.price = random.randint(50, 1000)
+        product.description = self.faker.paragraph()
+        product.quantity = random.randint(2, 20)
+        product.location = random.choice(STATE_NAMES)
+        product.imagePath = ""
+        product.category = category.id
+    
+        # Save to the testing database
+        product.save()
+
+        # Define the URL path for delete
+        url = f'/products/{product.id}'
+
+        # Initiate DELETE request and capture the response
+        response = self.client.delete(url)
+
+        # Assert that the response status code is 204 (NO CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Initiate GET request and capture the response
+        response = self.client.get(url)
+
+        # Assert that the response status code is 404 (NOT FOUND)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

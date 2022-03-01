@@ -19,8 +19,7 @@ class PaymentTypeView(ViewSet):
     def list(self, request):
         """Get a list of payment types for the current user"""
         payment_types = PaymentType.objects.all()
-        # for payment_type in payment_types:
-        #      payment_type.customer = request.auth.user
+
         serializer = PaymentTypeSerializer(payment_types.filter(customer=request.auth.user), many=True)
         return Response(serializer.data)
 
@@ -42,8 +41,8 @@ class PaymentTypeView(ViewSet):
         try:
             payment_type = PaymentType.objects.create(
                 customer=request.auth.user,
-                merchant_name=request.data['acctNumber'],
-                acct_number=request.data['merchant']
+                merchant_name=request.data['merchant'],
+                acct_number=request.data['acctNumber']
             )
             serializer = PaymentTypeSerializer(payment_type)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -61,7 +60,7 @@ class PaymentTypeView(ViewSet):
             )
         }
     )
-    def delete(self, request, pk):
+    def destory(self, request, pk):
         """Delete a payment type"""
         try:
             payment_type = PaymentType.objects.get(pk=pk)
