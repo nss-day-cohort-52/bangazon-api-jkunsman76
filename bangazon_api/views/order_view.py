@@ -59,6 +59,7 @@ class OrderView(ViewSet):
     def complete(self, request, pk):
         """Complete an order by adding a payment type and completed data
         """
+        """payment types for users are showing for all users even if its not you """
         try:
             order = Order.objects.get(pk=pk, user=request.auth.user)
             payment_type = PaymentType.objects.get(
