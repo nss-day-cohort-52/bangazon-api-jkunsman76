@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from bangazon_api.helpers import STATE_NAMES
 from bangazon_api.models import Category
 from bangazon_api.models.product import Product
+from bangazon_api.models import Store
 
 
 class ProductTests(APITestCase):
@@ -80,6 +81,7 @@ class ProductTests(APITestCase):
         Ensure we can delete a product.
         """
         # Create new instance
+        store = self.user1.store
         category = Category.objects.first()
         product = Product()
         product.name = self.faker.ecommerce_name()
@@ -88,13 +90,14 @@ class ProductTests(APITestCase):
         product.quantity = random.randint(2, 20)
         product.location = random.choice(STATE_NAMES)
         product.imagePath = ""
-        product.category = category.id
+        product.category = category
+        product.store = store
     
         # Save to the testing database
         product.save()
 
         # Define the URL path for delete
-        url = f'/products/{product.id}'
+        url = f'/api/products/{product.id}'
 
         # Initiate DELETE request and capture the response
         response = self.client.delete(url)

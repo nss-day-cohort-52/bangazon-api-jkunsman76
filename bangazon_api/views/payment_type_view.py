@@ -60,11 +60,8 @@ class PaymentTypeView(ViewSet):
             )
         }
     )
-    def destory(self, request, pk):
+    def destroy(self, request, pk):
         """Delete a payment type"""
-        try:
-            payment_type = PaymentType.objects.get(pk=pk)
-            payment_type.delete()
-            return Response(None, status=status.HTTP_204_NO_CONTENT)
-        except PaymentType.DoesNotExist as ex:
-            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+        payment_type = PaymentType.objects.get(pk=pk)
+        payment_type.delete()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
