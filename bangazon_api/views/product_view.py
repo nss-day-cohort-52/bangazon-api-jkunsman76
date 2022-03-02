@@ -187,7 +187,6 @@ class ProductView(ViewSet):
         if location is not None:
             products = products.filter(location__contains=location)
             
-
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
