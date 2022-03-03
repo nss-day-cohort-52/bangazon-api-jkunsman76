@@ -38,10 +38,16 @@ class OrderTests(APITestCase):
         """The orders list should return a list of orders for the logged in user"""
         response = self.client.get('/api/orders')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), Order.objects.count())
 
     def test_delete_order(self):
         response = self.client.delete(f'/api/orders/{self.order1.id}')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     # TODO: Complete Order test
+    def test_complete_order(self):
+        
+        
+        
+        response = self.client.put(f'/api/orders/{self.order1.id}/complete')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

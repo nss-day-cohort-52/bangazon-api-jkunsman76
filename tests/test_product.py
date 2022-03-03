@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from bangazon_api.helpers import STATE_NAMES
 from bangazon_api.models import Category
 from bangazon_api.models.product import Product
-from bangazon_api.models import Store
+
 
 
 class ProductTests(APITestCase):
