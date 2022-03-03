@@ -183,10 +183,13 @@ class ProductView(ViewSet):
 
         if name is not None:
             products = products.filter(name__icontains=name)
-            
+
         if location is not None:
             products = products.filter(location__contains=location)
-            
+        #TODO:Add like option
+        # if liked is not None:
+        #    products = products.filter(liked__)
+ 
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
