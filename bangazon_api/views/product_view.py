@@ -8,10 +8,10 @@ from rest_framework.exceptions import ValidationError
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from bangazon_api.helpers import STATE_NAMES
-from bangazon_api.models import Product, Store, Category, Order, Rating, Recommendation
+from bangazon_api.models import Product, Store, Category, Order, Rating, Recommendation, Like
 from bangazon_api.serializers import (
     ProductSerializer, CreateProductSerializer, MessageSerializer,
-    AddProductRatingSerializer, AddRemoveRecommendationSerializer)
+    AddProductRatingSerializer, AddRemoveRecommendationSerializer, LikeUnlikeSerializer)
 from django.db.models import Q
 
 
@@ -269,7 +269,57 @@ class ProductView(ViewSet):
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
         except Order.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+        
+    @swagger_auto_schema(
+        method='DELETE',
+        request_body=LikeUnlikeSerializer(),
+        responses={
+            204: openapi.Response(
+                description="No content, your like was removed",
+            ),
+            404: openapi.Response(
+                description="Either the Product or User was not found",
+                schema=MessageSerializer()
+            ),
+        }
+    )
+    @swagger_auto_schema(
+        method='POST',
+        request_body=LikeUnlikeSerializer(),
+        responses={
+            201: openapi.Response(
+                description="No content, added to your likes",
+            ),
+            404: openapi.Response(
+                description="Either the Product or User was not found",
+                schema=MessageSerializer()
+            )
+        }
+    )
+    @action(methods=['post', 'delete'], detail=True)
+    def like(self, request, pk):
+        """Like/unlike a product"""
+        
+        product = Product.objects.get(pk=pk)
+        customer = User.objects.get(username=request.data['username'])
+        if request.method == "POST":
+            like = Like.objects.create(
+                product=product,
+                liked=request.auth.user,
+                customer=customer
+            )
 
+            return Response(None, status=status.HTTP_201_CREATED)
+
+        if request.method == 'DELETE':
+            like = Like.objects.get(
+                product=product,
+                liked=product,
+                customer=customer
+            )
+            like.delete()
+
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
     @swagger_auto_schema(
         method='DELETE',
         request_body=AddRemoveRecommendationSerializer(),
@@ -296,6 +346,7 @@ class ProductView(ViewSet):
             )
         }
     )
+
     @action(methods=['post', 'delete'], detail=True)
     def recommend(self, request, pk):
         """Add or remove a recommendation for a product to another user"""
