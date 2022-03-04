@@ -3,11 +3,12 @@ from bangazon_api.models import Product
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    is_liked = serializers.BooleanField(required=False)
     class Meta:
         model = Product
         fields = ('id', 'name', 'price', 'description', 'average_rating',
                   'quantity', 'location', 'image_path', 'category', 'store',
-                  'ratings', 'number_purchased','orders')
+                  'ratings', 'number_purchased','orders','is_liked')
         depth = 1
 
 
@@ -21,11 +22,9 @@ class CreateProductSerializer(serializers.Serializer):
     image = serializers.ImageField()
 
 
-class AddRemoveRecommendationSerializer(serializers.Serializer):
+class AddRemoveRecommendationSerializer(serializers.Serializer): 
     username = serializers.CharField()
     
-class LikeUnlikeSerializer(serializers.Serializer):
-    username = serializers.CharField()
 
 class AddProductRatingSerializer(serializers.Serializer):
     score = serializers.IntegerField()

@@ -3,8 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Favorite(models.Model):
-    customer = models.ForeignKey(
-        User, on_delete=models.CASCADE)
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
     store = models.ForeignKey("Store", on_delete=models.CASCADE)
 
     def __str__(self):
